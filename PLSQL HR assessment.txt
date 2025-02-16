@@ -1,0 +1,365 @@
+1)1.Create a plsql procedure, that copy the all record of department_id, department_name and
+-- location_id of all departments that located in country_id of "US" to a table called "Department_US" using the
+-- cursor with basic loop.
+-- Display how many rows were copied , if not then display the message "NO RECORDS FOUND".
+
+-- Note :create a table Department_US with
+-- structure ((HR SCHEME)
+-- Field Name Datatype
+-- ----------------- -------------
+-- Department_Id number
+-- Department_name varchar2(40)
+-- Location_id number
+
+create or replace procedure hr_procedure is 
+	v_department_id departments.department_id%type;
+    v_department_name departments.department_name%type;
+	v_location_id locations.location_id%type;
+	v_rows_count number := 0;
+
+    cursor c_hrs is 
+ 	select d.department_id,d.department_name , l.location_id  
+    from hr.departments d 
+    join hr.locations l on d.location_id = l.location_id 
+    where l.country_id = 'US';
+Begin
+    open c_hrs;
+loop 
+    fetch c_hrs into v_department_id , v_department_name , v_location_id;
+	exit when c_hrs%notfound;
+	insert into departments_us(department_id,department_name , location_id ) values(v_department_id,v_department_name,v_location_id);
+	v_rows_count := v_rows_count + 1;
+end loop;
+	close c_hrs;
+if v_rows_count > 0 then 
+    dbms_output.put_line('Data Found');
+else 
+    dbms_output.put_line('No Data Found');
+end if;
+    
+exception 
+    when others then 
+    dbms_output.put_line('NO RECORDS FOUND');
+end hr_procedure;
+/
+
+-- Create a procedure named as "deleteemp( depit in number) " that delete rows from the employees table. 
+-- It should accept 1 parameter, departmentId; only delete the employee records belonging to that departmentid. 
+-- Display how many employees were deleted else raise"DeptIDNotFound"  and print the message 'No Records Found' (HR SCHEME)
+
+create or replace procedure deleteemp(depit in number) is 
+    no_rows_del number := 0;
+	DeptIDNotFound Exception;
+begin 
+    delete from hr.employees where department_id = depit;
+	no_rows_del := sql%rowcount; 
+    if no_rows_del = 0 then 
+	raise DeptIDNotFound;
+	else 
+	dbms_output.put_line(no_rows_del || 'no records deleted');
+	end if ;
+exception 
+	when DeptIDNotFound then 
+	dbms_output.put_line('No Records Found');
+	when others then
+        dbms_output.put_line('An error Found'|| SQLERRM);
+end deleteemp;
+/
+
+
+-- create a proedurce that gives all employees in IT job_id, with  22 % pay increase in there salary 
+-- Display a message how many Employees were give salary hike the increase. If no employee found then print the message 'No Records Found' ((HR SCHEME))
+
+create or replace procedure sal_hike_emp  as 
+    v_row_count number ;
+	norecordsfound Exception;
+	
+begin 
+	update hr.employees set salary = salary * 0.22 where job_id like '%IT%';
+	v_row_count := sql%rowcount;
+	if v_row_count = 0 then 
+	raise norecordsfound;
+	else 
+	dbms_output.put_line(v_row_count);
+	end if;
+	exception 
+         when norecordsfound then 
+        dbms_output.put_line('No records Found.');
+end sal_hike_emp;
+/
+
+
+-- Write a procedure to perform salary hike operation that only permits a hike , 
+-- if there is salary is less than  8000, then update the  salary  with employee table and print the message 'Salary Hike is successful' 
+-- else print 'Salary is greater than 8000'.((HR SCHEME))  procedure named as salhike(hike  as number)
+
+create or replace procedure salhike(hike in number) as
+    begin 
+	update hr.employees set salary = salary*commission_pct + salary where salary < 8000;
+	if salary < 8000 then 
+	dbms_output.put_line('Salary hike is Successful');
+	else 
+	dbms_output.put_line('Salary is greater than 8000');
+	end if;
+end salhike;
+/
+
+
+-- 5.Write procedure to display the number of department to the location_id as 'Number of Department in location id[50] is [25]' 
+-- by pass the argument to procedure as location_id with named as deptcount(loc number).
+
+create or replace procedure deptcount(loc in number) is 
+    v_dept_count number ;
+	begin 
+	select count(department_id) into v_dept_count from hr.departments   where location_id = loc;
+	dbms_output.put_line('Number of Departments in location id [' || loc || '] is [' || v_dept_count ||']');
+end deptcount;
+
+
+-- Write the procedure to copy the manager record from employees table and move records to managers table. 
+-- Procedure is named with mgremp and display the "Number of record is copied is" if not then "No record insert into manager" using the basic loop with cursor.
+
+-- Note: create a table mgremp with stucture
+-- 	empid		number,
+-- 	first_name	varchar2(30);
+-- 	job_id		varchar2(30);
+-- 	department_id	number..
+
+create table mgremp(empid number,first_name varchar2(30),job_id varchar2(30),department_id number);
+
+
+create or replace procedure v_mgremp is 
+    v_manager employees.manager_id%type;
+	v_rows_count number := 0;
+cursor c_emp is 
+    insert into mgremp (manager_id ) select manager_id from employees ;
+	begin 
+	loop 
+	open c_emp ;
+	fetch c_emp into v_manager;
+	exit c_emp%notfound;
+	if v_rows_count > 0 then 
+	dbms_output.put_line('number of records copied is ' || v_rows_count);
+	else 
+	dbms_output.put_line('No records copied');
+	end if;
+	end loop;
+	close c_emp;
+end v_mgremp;
+/
+
+
+
+FUNCTIONS :
+
+
+
+
+-- 1. Write a PLSQL user defined function as empname to concatenate firstname and lastname of an employee. Pass employee id as an input to the functions
+-- empname  Output of function returns :-  Mr/Mrs. Sam Peter
+
+create or replace function empname(v_employee_id in number,v_empname out varchar2) return varchar2 as 
+		message varchar2(50);
+Begin 
+		select (first_name || ' ' || last_name) as full_name into v_empname from hr.employees where employee_id = v_employee_id;
+		message := 'Mr/Mrs' || v_empname;
+		return message;
+end empname;
+/
+
+-- Write user define function as deptloc to return departmentname-city-Country_name example "IT-NewYork-USA".
+-- Function is passed with department_id as an input
+
+create or replace function deptloc(v_deptid in number) return varchar2 is
+	message varchar2(50);
+	v_department_name hr.departments.department_name%type;
+	v_city hr.locations.city%type;
+	v_country_name hr.countries.country_name%type;
+begin 
+	select d.department_name , l.city , c.country_name into v_department_name , v_city , v_country_name from hr.departments d 
+	join hr.locations l on d.location_id = l.location_id 
+	join hr.countries c on l.country_id = c.country_id where d.department_id = v_deptid;
+	message := v_department_name || ' - ' || v_city || ' - ' || v_country_name;
+	return message;
+end ;
+/
+
+
+-- Write function as empexp( empid number) which returns the experence of the employee, 
+-- When function is passed as input of employee_id return as experence of that employee.
+
+create or replace function empexp(empid in number) return number is 
+    	message number;
+		v_months  number;
+		v_years  number;
+begin 
+	select floor(months_between(sysdate,hire_date)/12) as years_exp , mod(floor(months_between(sysdate,hire_date)),12) as year_exp into v_years , v_months 
+	from hr.employees where employee_id = empid;
+	message := v_years || 'years' || v_months ||'months';
+	return message ;
+end ;
+
+
+-- 4.Write a function to calculate the total salary by salary commission 
+-- and  deduction of professional tax of 6% from total salary if total salary is greater than or equal to $15000 and less than 15000 is 2.5%. 
+-- function named as salcal with two parameter of salary and commission.
+
+create or replace function salcal (p_salary in NUMBER, p_commission in NUMBER) return number is
+    v_total_salary number;
+    v_final_salary number;
+begin
+    -- Calculate the total salary by adding the salary and commission
+    v_total_salary := p_salary + p_commission;
+
+    -- Deduct the professional tax based on the total salary
+    if v_total_salary >= 15000 then
+        v_final_salary := v_total_salary * (1 - 0.06); -- Deduct 6% tax
+    else
+        v_final_salary := v_total_salary * (1 - 0.025); -- Deduct 2.5% tax
+    end if;
+
+    return v_final_salary;
+end salcal;
+/
+ 
+
+
+TRIGGERS :
+
+
+
+-- 1. Write the trigger to the employee  table when the deleted event happened. 
+-- so that when an employee record is deleted the record details need to be inserted into  an table called X_Emp along  with deleted date
+
+-- Note : Assume X_emp  table is existing  with 
+
+-- Field Name      datatype
+-- --------------------------------
+-- Employee_ID	number
+-- First_name	Varchar2(30)
+-- department_id	number
+-- deleted_date	date
+create table X_emp(Employee_ID	number,First_name	Varchar2(30), department_id	number,deleted_date	date);
+
+create or replace trigger emp_trigger before delete on hr.employees for each row 
+declare
+    v_emp_id hr.employees.employee_id%type;
+    v_first_name hr.employees.first_name%type;
+    v_deptid hr.employees.department_id%type;
+begin
+    v_emp_id := :old.employee_id;
+	v_first_name := :old.first_name;
+	v_deptid := :old.department_id;
+    
+		insert into X_emp values(v_emp_id,v_first_name,v_deptid,sysdate);
+end emp_trigger;
+/
+-------------------------or--------------------------------------
+    
+-- create or replace trigger emp_trigger before delete on hr.employees for each row 
+-- declare
+-- 	begin 
+-- 		insert into X_emp values(:old.employee_id,:old.first_name,:old.department_id,sysdate);
+-- end emp_trigger;
+-- /
+
+-- 2. Create a tigger to display the message "Place a order for the Product <product_name>",
+--  when ever a item quantity reached 10 and below in product table when  updating or inserting an item in order table.
+-- Products  table 
+-- -----------------------
+-- Pid	ProductName	Qty
+-- 100	Mouse		50
+-- 101	Keyboard	32
+-- 102	Pendrive	5
+-- 103	RAM		12
+-- Order Table
+-- ------------------
+-- Oid 	Pid  	 qty
+-- 1000	100	45
+-- 1001	101	2
+-- 1003	102	25
+
+-- Output:
+-- "Place a Order for the product Mouse
+
+create or replace trigger trigger_name before update or insert on orders for each row 
+declare 
+    
+begin 
+	if inserting then 
+		insert into products values(:new.Pid,:new.ProductName,:new.Qty);
+	elsif updating then
+		update products set qty = qty - :new.qty where pid = :old.pid; 
+		if (select Qty from products where pid = :old.pid <= 10) then 
+		dbms_output.put_line('Place a order for the Product ' || :old.productname);
+		end if;
+	end if;
+end trigger_name;
+----------------------------or----------------------------------
+
+-- CREATE OR REPLACE TRIGGER trigger_name
+-- AFTER INSERT OR UPDATE ON orders
+-- FOR EACH ROW
+-- DECLARE
+--     v_qty products.qty%TYPE;
+--     v_product_name products.productname%TYPE;
+-- BEGIN
+--     -- Fetch the current quantity and product name from the products table
+--     SELECT qty, productname
+--     INTO v_qty, v_product_name
+--     FROM products
+--     WHERE pid = :NEW.pid;
+
+--     -- Check if the quantity is 10 or below
+--     IF v_qty <= 10 THEN
+--         DBMS_OUTPUT.PUT_LINE('Place a order for the Product ' || v_product_name);
+--     END IF;
+-- END trigger_name;
+-- /
+
+
+-- 3. ) Create  trigger on the employee table when the update is happened to employee's salary field. 
+-- wirte the action to trigger to  Insert the employee's old salary in 	empoldsal table
+
+--   empoldsal  table
+-- ----------------------------
+-- Field Name 	datatype
+-- empid		number
+-- firstname	varchar2(30)
+-- Oldsalary	number
+
+create or replace trigger emp_trg before update of salary on hr.employees for each row 
+declare 
+begin 
+	insert into empoldsal values(:new.fieldName,:new.empid,:new.firstname,:old.oldsalary);
+end emp_trg;
+/
+
+
+-- 4.Write trigger on emp table for the event of update to column of salary.
+--  when the salary is update to emp table stored old salary into empoldsal table. Display 'Record is inserted into empoldsal'.
+
+create or replace trigger emp_trg before update of salary on hr.employees for each row 
+declare 
+begin 
+	insert into empoldsal values(:new.fieldName,:new.empid,:new.firstname,:old.oldsalary);
+	dbms_output.put_line('Record is inserted into empoldsal');
+end emp_trg;
+
+	
+
+
+
+
+
+
+
+
+
+	
+
+	
+
+
+	
+

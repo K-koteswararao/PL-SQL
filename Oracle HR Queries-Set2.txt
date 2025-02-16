@@ -1,0 +1,63 @@
+1)Retrieve the employee names in uppercase to standardize the reporting format.
+2)Fetch employee first names in lowercase for email ID generation.
+3)Display employee first names with only the first letter capitalized (Title Case).
+4)Extract the first three letters of each employee’s first name for department username creation.
+5)Retrieve employees whose last names contain the letter "A" in any position.
+6)Replace 'Manager' with 'Lead' in the job title column for specific employees.
+7)Retrieve employees hired in the last 6 months from the hire_date column.
+8)Fetch the last working day of the current month for payroll processing.
+9)Find employees whose hire date falls on a Monday for training batch scheduling.
+10)Calculate the number of months each employee has worked in the company.
+11) Retrieve employees' salary rounded to the nearest thousand for budgeting purposes.
+12)Find employees earning an odd salary amount using the MOD function.
+13)Display the salary without decimal values for a financial summary report.
+14)Show employee commission, but if NULL, display "No Commission" instead using NVL.
+15) Display 'Eligible for Bonus' if the commission is not NULL; otherwise, display "Not Eligible" using NVL2.
+Classify employees based on their salary range
+
+16)If salary is greater than 15,000, categorize as "High Salary"
+	If salary is between 10,000 and 15,000, categorize as "Medium Salary"
+	Otherwise, categorize as "Low Salary"
+	Determine bonus eligibility based on job title
+
+17)If the employee is a Manager, assign a 20% bonus
+	If the employee is in Sales, assign a 15% bonus
+	Otherwise, assign a 10% bonus
+	Display experience level of employees based on hire date
+
+18)If hired before 2005, label as "Senior Employee"
+	If hired between 2005 and 2015, label as "Mid-Level Employee"
+	Otherwise, label as "Junior Employee"
+	Check if an employee is eligible for a commission
+
+19)If commission_pct is NULL, display "No Commission"
+	Otherwise, display "Eligible for Commission"
+	Classify employees based on department
+
+20)If an employee works in the IT department, display "Tech Team"
+If an employee works in the HR department, display "HR Team"
+Otherwise, display "Other Team"
+
+---------------------------------------------------------------------
+
+1) Retrieve all employee details from the EMPLOYEES table.
+2) Fetch the first name, last name, and salary of all employees in descending order of salary.
+3) Get the department name and location of all departments from the DEPARTMENTS table.
+4)  Find the job titles available in the JOBS table.
+5) Fetch the details of employees whose salary is greater than $10,000.
+6) List employees whose first name starts with 'A'.
+7) Retrieve employees who were hired after January 1, 2005.
+8) Get the total number of employees in each department.
+9) Calculate the average salary for each job title.
+10) List departments that have more than 5 employees.
+11) Retrieve employee names along with their department names.
+12  Fetch employee names along with their job titles from the JOBS table.
+13) Get a list of employees along with their manager’s name.
+14)Fetch employees along with their department and location.
+15) Retrieve the department name for employees earning more than $12,000.
+
+16)Retrieve employees who earn more than the average salary of the company.
+17)Find employees who have the same salary as employee_id=101.
+18)Get the list of employees who work in the same department as employee_id=200.
+19)Fetch the highest-paid employee details.
+20)List employees who earn less than the department’s average salary.

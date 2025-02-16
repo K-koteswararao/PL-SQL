@@ -1,0 +1,234 @@
+create or replace procedure obpro1 as
+begin
+dbms_output.put_line('Welcome  PLSQL');
+dbms_output.put_line('PLSQLis Extension for SQl');
+end;
+-----------------------------------------------------
+create or replace PROCEDURE OBPRO2 AS 
+BEGIN
+dbms_output.put_line('Hello World');
+dbms_output.put_line('Procedure is  for   bulk  data transaction');
+END OBPRO2;
+-----------------------------------------------------
+create or replace PROCEDURE OBPRO3 AS 
+db varchar2(20);
+dbver  number:=11;
+dbms varchar2(20);
+
+BEGIN
+  db := 'Oracle Express';
+  dbms:= dbver||'g';
+  dbms:=db||' ' ||dbms;
+  DBMS_OUTPUT.PUT_LINE('Database :'||dbms);
+   
+  
+END OBPRO3;
+------------------------------------------------------
+create or replace PROCEDURE OBPRO4 AS 
+v_sal number:=15000;
+BEGIN
+  insert into emp values(500,'Nancy',sysdate, 'SQL_Dev',v_sal+2500,60);
+   insert into emp values(502,'Sam',sysdate, 'SQL_Dev',v_sal,60);
+    insert into emp values(505,'Jane Mary',sysdate, 'Sr.SQL_Dev',v_sal*.10+v_sal,60);
+    update  emp set salary=salary+555 where job_id='IT_PROG';
+    delete from emp  where empid between  194  and 197;
+  dbms_output.put_line('Procedure Complete DML Opreation in EMp  table');
+END OBPRO4;
+----------------------------------------------------
+create or replace PROCEDURE OBPRO5 AS 
+v_sal number;
+v_deptid number:=60;
+v_job_id varchar(20) :='Sr.SQL_Dev';
+BEGIN
+  select avg(salary) into v_sal from emp where deptid=v_deptid;
+  if v_job_id='Sr.SQL_Dev' then
+    v_sal:=v_sal*.10+v_sal;
+  else
+     v_sal:=v_sal*.05+v_sal;
+end if;
+   insert into emp values(505,'Pat',sysdate, v_job_id,v_sal,60);
+   insert into emp values(507,'Rob',sysdate, v_job_id,v_sal,60);
+  
+   
+  dbms_output.put_line('Procedure Complete DML Opreation in EMp  table');
+  
+END OBPRO5;
+
+-------------------------------------------
+create or replace PROCEDURE OBPRO6 (  V_JOB_ID IN VARCHAR2 ) AS 
+
+v_sal number;
+v_deptid number:=60;
+
+BEGIN
+  select avg(salary) into v_sal from emp where deptid=v_deptid;
+   dbms_output.put_line('Avg Salary for dept 60 is '||v_sal);
+  if v_job_id='Sr.SQL_Dev' then
+    v_sal:=v_sal*.10+v_sal;
+  else
+     v_sal:=v_sal*.05+v_sal;
+end if;
+   insert into emp values(520,'Rose',sysdate, v_job_id,v_sal,60);
+   insert into emp values(525,'Jack',sysdate, v_job_id,v_sal,60);
+  
+  
+  dbms_output.put_line('Procedure Complete DML Opreation in EMp  table');
+
+END OBPRO6;
+----------------------------------------------
+
+create or replace PROCEDURE OBPRO7 (  V_EMP IN NUMBER ) AS 
+v_empname varchar2(3);
+v_doj date;
+v_sal number;
+v_job varchar2(20);
+BEGIN
+  
+  select empname,doj,job_id,salary into v_empname,v_doj,v_job,v_sal from emp where empid=v_emp;
+  dbms_output.put_line('EmpName:'||v_empname);
+  dbms_output.put_line('DoJ:'||v_doj);
+  dbms_output.put_line('Job ID:'||v_job);
+  dbms_output.put_line('Salary :'||v_sal);
+  
+END OBPRO7;
+
+----------------------------------------------------
+create or replace PROCEDURE OBPRO8 (  V_EMP IN NUMBER ) AS 
+v_empname emp.empname%type;
+v_doj date;
+v_sal number;
+v_job emp.job_id%type;
+BEGIN
+  
+  select empname,doj,job_id,salary into v_empname,v_doj,v_job,v_sal from emp where empid=v_emp;
+  dbms_output.put_line('EmpName:'||v_empname);
+  dbms_output.put_line('DoJ:'||v_doj);
+  dbms_output.put_line('Job ID:'||v_job);
+  dbms_output.put_line('Salary :'||v_sal);
+END OBPRO8;
+--------------------------------------------------
+create or replace PROCEDURE OBPRO9 (  V_EMP IN NUMBER ) AS 
+r_emp emp%rowtype;
+BEGIN
+  select * into r_emp from emp;
+  dbms_output.put_line('EmpName:'||r_emp.empname);
+  dbms_output.put_line('DoJ:'||r_emp.doj);
+  dbms_output.put_line('Job ID:'||r_emp.job_id);
+  dbms_output.put_line('Salary :'||r_emp.salary);
+  
+  exception
+    when no_data_found then
+        dbms_output.put_line('No Employee Found to this ID :'||v_emp);
+     when invalid_number then
+        dbms_output.put_line('No Employee Found to this ID :'||v_emp);
+    when too_many_rows then
+        dbms_output.put_line('Fetch more than one  record by SELECT statement');
+    when Others then
+        dbms_output.put_line('Some Error Occured....');
+END OBPRO9;
+--------------------------------------------
+
+create or replace PROCEDURE OBPRO10 (  V_EMPID IN VARCHAR2 ) AS 
+
+r_emp emp%rowtype;
+e_noemp exception;
+BEGIN
+if v_empid  between 100  and 200 then
+  select * into r_emp from emp where empid =v_empid;
+else
+    raise e_noemp;
+end if;
+  dbms_output.put_line('EmpName:'||r_emp.empname);
+  dbms_output.put_line('DoJ:'||r_emp.doj);
+  dbms_output.put_line('Job ID:'||r_emp.job_id);
+  dbms_output.put_line('Salary :'||r_emp.salary);
+exception
+ when e_noemp then
+        dbms_output.put_line('EmpNumber with Range of 100 and 200, Your input is Wrong');
+     
+    when Others then
+        dbms_output.put_line('Some Error Occured....');
+  
+ 
+END OBPRO10;
+-------------------------------------------------
+
+create or replace PROCEDURE OBPRO11 AS 
+r_emp emp%rowtype;
+v_emp number:=100;
+BEGIN
+loop
+            select * into r_emp from emp where empid=v_emp;
+            dbms_output.put_line('EmpID :'||r_emp.empid);
+            dbms_output.put_line('EmpName:'||r_emp.empname);
+             dbms_output.put_line('DoJ:'||r_emp.doj);
+            dbms_output.put_line('Job ID:'||r_emp.job_id);
+            dbms_output.put_line('Salary :'||r_emp.salary);
+             dbms_output.put_line('-------------------------------------------');
+            v_emp:=v_emp+1;
+            exit when v_Emp=201;
+end loop;
+END OBPRO11;
+------------------------------------------------
+create or replace PROCEDURE OBPRO12 AS 
+r_emp emp%rowtype;
+begin
+for v_emp in 100..2000
+loop
+         select * into r_emp from emp where empid=v_emp;
+            dbms_output.put_line('EmpName:'||r_emp.empname);
+             dbms_output.put_line('DoJ:'||r_emp.doj);
+            dbms_output.put_line('Job ID:'||r_emp.job_id);
+            dbms_output.put_line('Salary :'||r_emp.salary);
+             dbms_output.put_line('-------------------------------------------');
+end loop;
+END OBPRO12;
+--------------------------------------------
+
+create or replace PROCEDURE OBPRO13 AS 
+cursor c_emp is select  *  from emp;
+r_emp c_emp%rowtype;
+
+BEGIN
+
+open c_emp;
+    loop
+        fetch c_emp into r_emp;
+        exit when c_emp%notfound;
+                 dbms_output.put_line('EmpID :'||r_emp.empid);
+                 dbms_output.put_line('EmpName:'||r_emp.empname);
+                 dbms_output.put_line('DoJ:'||r_emp.doj);
+                dbms_output.put_line('Job ID:'||r_emp.job_id);
+                dbms_output.put_line('Salary :'||r_emp.salary);
+                dbms_output.put_line('-------------------------------------------');
+
+    end loop;
+close c_emp;  
+END OBPRO13;
+
+-----------------------------
+
+create or replace PROCEDURE OBPRO14 AS 
+cursor c_emp is select  *  from emp;
+r_emp c_emp%rowtype;
+v_saladd number;
+v_sal number;
+BEGIN
+
+open c_emp;
+    loop
+        fetch c_emp into r_emp;
+        exit when c_emp%notfound;
+               if r_emp.deptid =60 then
+                   v_saladd:=55; 
+                else
+                    v_saladd:=33;
+                end if;
+                v_sal:=r_emp.salary+v_saladd;
+            insert into emp25 values(r_emp.empid,r_emp.empname,r_emp.doj,r_emp.job_id,v_sal,r_emp.deptid);
+
+    end loop;
+close c_emp;  
+END OBPRO14;
+
+------------------------------------
